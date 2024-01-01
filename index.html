@@ -2,9 +2,86 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Digit Classifier</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: white;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        #titleContainer {
+            background-color: lightgrey;
+            width: 100%;
+            padding: 10px 20px;
+            text-align: left;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            opacity: 0.9;
+            border-bottom: 1px solid black;
+        }
+        #titleContainer h1 {
+            margin: 0;
+            color: black;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        #dragDropContainer {
+            width: 300px;
+            height: 200px;
+            border: 2px dashed black;
+            border-radius: 15px;
+            margin-top: -60px; /* Adjusted top margin for drag and drop box */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: lightgrey;
+            font-size: 16px;
+            text-align: center;
+            cursor: pointer;
+        }
+        @media (max-width: 600px) {
+            #titleContainer h1 {
+                font-size: 20px;
+            }
+            #dragDropContainer {
+                width: 250px;
+                height: 150px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div id="titleContainer">
+        <h1>Aqua GVT \ Photos</h1>
+    </div>
+    <div id="dragDropContainer">
+        Drag and drop files here
+    </div>
 
+    <!-- JavaScript for Drag and Drop functionality -->
+    <script>
+        var dropContainer = document.getElementById('dragDropContainer');
+
+        dropContainer.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            // You can add additional code here to change style during drag over
+        });
+
+        dropContainer.addEventListener('drop', function(e) {
+            e.preventDefault();
+            var files = e.dataTransfer.files;
+            // You can handle file upload or processing here
+        });
+    </script>
 </body>
 </html>
