@@ -22,7 +22,7 @@ def download_image(url, filename):
 
 # Download an example image
 #image_url = "http://images.cocodataset.org/val2017/000000439715.jpg"
-image_path = "johnpaul.jpg"
+image_path = "IMG_2356 (1).jpg"
 #download_image(image_url, image_path)
 
 # Read the image using OpenCV
