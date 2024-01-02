@@ -21,9 +21,9 @@ def download_image(url, filename):
             file.write(response.content)
 
 # Download an example image
-image_url = "http://images.cocodataset.org/val2017/000000439715.jpg"
-image_path = "input.jpg"
-download_image(image_url, image_path)
+#image_url = "http://images.cocodataset.org/val2017/000000439715.jpg"
+image_path = "johnpaul.jpg"
+#download_image(image_url, image_path)
 
 # Read the image using OpenCV
 im = cv2.imread(image_path)
