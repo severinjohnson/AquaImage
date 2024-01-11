@@ -6,6 +6,8 @@ from detectron2.utils.visualizer import Visualizer
 from detectron2.data import MetadataCatalog
 import cv2
 import numpy as np
+import tempfile  # Import for handling temporary files
+import os
 from io import BytesIO
 
 app = Flask(__name__)
@@ -22,6 +24,7 @@ def upload_file():
         return "No selected file", 400
     if file:
         # Read the image
+        print("Received file:", file.filename)
         filestr = file.read()
         npimg = np.frombuffer(filestr, np.uint8)
         im = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
@@ -43,10 +46,15 @@ def upload_file():
         overlayed_image = out.get_image()[:, :, ::-1]
 
         # Convert image to bytes
-        _, buffer = cv2.imencode('.jpg', overlayed_image)
-        io_buf = BytesIO(buffer)
+        _, temp_file_path = tempfile.mkstemp(suffix='.jpg')
+        cv2.imwrite(temp_file_path, overlayed_image)
 
-        return send_file(io_buf, mimetype='image/jpeg', as_attachment=True, attachment_filename='prediction.jpg')
+        # Send the temporary file
+        response = send_file(temp_file_path, mimetype='image/jpeg', as_attachment=True)
 
+        # Cleanup: Delete the temporary file after sending
+        os.remove(temp_file_path)
+
+        return response
 if __name__ == '__main__':
     app.run(debug=True)
