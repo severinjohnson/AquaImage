@@ -19,7 +19,7 @@
             background-color: lightgrey;
             width: 100%;
             padding: 10px 20px;
-            text-align: left; /* Center align title */
+            text-align: center; /* Center align title */
             position: fixed;
             top: 0;
             left: 0;
@@ -45,6 +45,28 @@
             margin-top: 20px;
             width: 80%;
             text-align: center;
+            display: none; /* Initially hidden */
+        }
+        img {
+            max-width: 100%; /* Make image responsive */
+            max-height: 80vh; /* Adjust to viewport height */
+            margin-top: 20px;
+        }
+        #backButton {
+            background-color: #505050;
+            color: #add8e6;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: bold;
+            transition: background-color 0.3s, color 0.3s;
+            margin: 5px;
+            display: none; /* Initially hidden */
+            margin-top: 20px;
+        }
+        #backButton:hover, #backButton:active {
+            background-color: black;
+            color: white;
         }
     </style>
 </head>
@@ -58,11 +80,20 @@
     <div id="resultContainer">
         <!-- The processed image will be displayed here -->
     </div>
+    <button id="backButton" onclick="goBack()">Back</button>
 
     <!-- JavaScript for Drag and Drop functionality -->
     <script>
         var dropContainer = document.getElementById('dragDropContainer');
         var resultContainer = document.getElementById('resultContainer');
+        var backButton = document.getElementById('backButton');
+
+        function goBack() {
+            resultContainer.innerHTML = '';
+            resultContainer.style.display = 'none';
+            dropContainer.style.display = 'flex';
+            backButton.style.display = 'none';
+        }
 
         dropContainer.addEventListener('dragover', function(e) {
             e.preventDefault();
@@ -85,6 +116,9 @@
                 img.src = url;
                 resultContainer.innerHTML = '';
                 resultContainer.appendChild(img);
+                resultContainer.style.display = 'block';
+                dropContainer.style.display = 'none';
+                backButton.style.display = 'block';
             })
             .catch(error => {
                 console.error('Error:', error);
