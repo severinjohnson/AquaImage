@@ -44,13 +44,31 @@
         #resultContainer {
             margin-top: 20px;
             width: 80%;
-            text-align: center;
             display: none; /* Initially hidden */
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
         }
+
+        #imageContainer {
+            max-width: 50%; /* Adjust as needed */
+            max-height: 80vh; /* Adjust to viewport height */
+            margin-right: 20px; /* Space between image and predictions */
+        }
+
         img {
             max-width: 100%; /* Make image responsive */
-            max-height: 80vh; /* Adjust to viewport height */
-            margin-top: 20px;
+            max-height: 100%;
+        }
+
+        #predictionsContainer {
+        max-width: 40%; /* Adjust as needed */
+        text-align: left;
+        background-color: lightgrey; /* Light grey background */
+        border-radius: 15px; /* Rounded corners */
+        padding: 15px; /* Padding inside the container */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow for depth */
+        margin-left: 20px; /* Optional: adds spacing between the image and predictions container */
         }
         #backButton {
             background-color: #505050;
@@ -77,53 +95,75 @@
     <div id="dragDropContainer">
         Drag and drop files here
     </div>
-    <div id="resultContainer">
-        <!-- The processed image will be displayed here -->
+    <div id="resultContainer" style="display: flex;">
+        <div id="imageContainer">
+            <!-- The processed image will be displayed here -->
+        </div>
+        <div id="predictionsContainer">
+            <!-- Predictions will be listed here -->
+        </div>
     </div>
+
     <button id="backButton" onclick="goBack()">Back</button>
 
     <!-- JavaScript for Drag and Drop functionality -->
     <script>
-        var dropContainer = document.getElementById('dragDropContainer');
-        var resultContainer = document.getElementById('resultContainer');
-        var backButton = document.getElementById('backButton');
+    var dropContainer = document.getElementById('dragDropContainer');
+    var resultContainer = document.getElementById('resultContainer');
+    var imageContainer = document.getElementById('imageContainer');
+    var predictionsContainer = document.getElementById('predictionsContainer');
+    var backButton = document.getElementById('backButton');
 
-        function goBack() {
-            resultContainer.innerHTML = '';
-            resultContainer.style.display = 'none';
-            dropContainer.style.display = 'flex';
-            backButton.style.display = 'none';
-        }
+    function goBack() {
+        imageContainer.innerHTML = ''; // Clear the image container
+        predictionsContainer.innerHTML = ''; // Clear the predictions container
+        resultContainer.style.display = 'none'; // Hide the result container
+        dropContainer.style.display = 'flex'; // Show the drop container again
+        backButton.style.display = 'none'; // Hide the back button
+    }
 
-        dropContainer.addEventListener('dragover', function(e) {
-            e.preventDefault();
-        });
+    dropContainer.addEventListener('dragover', function(e) {
+        e.preventDefault();
+    });
 
-        dropContainer.addEventListener('drop', function(e) {
-            e.preventDefault();
-            var files = e.dataTransfer.files;
-            var formData = new FormData();
-            formData.append('file', files[0]);
+    dropContainer.addEventListener('drop', function(e) {
+        e.preventDefault();
+        var files = e.dataTransfer.files;
+        var formData = new FormData();
+        formData.append('file', files[0]);
 
-            fetch('/upload', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.blob())
-            .then(blob => {
-                var url = URL.createObjectURL(blob);
-                var img = new Image();
-                img.src = url;
-                resultContainer.innerHTML = '';
-                resultContainer.appendChild(img);
-                resultContainer.style.display = 'block';
-                dropContainer.style.display = 'none';
-                backButton.style.display = 'block';
-            })
-            .catch(error => {
-                console.error('Error:', error);
+        fetch('/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the base64 image
+            var imgSrc = 'data:image/jpeg;base64,' + data.image;
+            var img = new Image();
+            img.src = imgSrc;
+            imageContainer.innerHTML = ''; // Clear previous image
+            imageContainer.appendChild(img);
+
+            // Handle predictions
+            var predictionsList = document.createElement('ul');
+            data.predictions.forEach(function(prediction) {
+                var listItem = document.createElement('li');
+                listItem.textContent = prediction;
+                predictionsList.appendChild(listItem);
             });
+            predictionsContainer.innerHTML = ''; // Clear previous predictions
+            predictionsContainer.appendChild(predictionsList);
+
+            // Show the result container and hide the drop container
+            resultContainer.style.display = 'flex';
+            dropContainer.style.display = 'none';
+            backButton.style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
-    </script>
+    });
+</script>
 </body>
 </html>

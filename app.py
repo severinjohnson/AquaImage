@@ -6,6 +6,8 @@ from detectron2.utils.visualizer import Visualizer
 from detectron2.data import MetadataCatalog
 import cv2
 import numpy as np
+import base64
+from flask import jsonify
 import tempfile  # Import for handling temporary files
 import os
 from io import BytesIO
@@ -40,20 +42,29 @@ def upload_file():
         predictor = DefaultPredictor(cfg)
         outputs = predictor(im)
 
+        # Extract predictions
+        predictions = []
+        instances = outputs["instances"].to("cpu")
+        for i in range(len(instances)):
+            prediction_class = instances.pred_classes[i]
+            class_name = MetadataCatalog.get(cfg.DATASETS.TRAIN[0]).thing_classes[prediction_class]
+            if class_name not in predictions:
+                predictions.append(class_name)
+
+        # Print predictions to console
+        #print("Predicted classes:", predictions)
+
         # Visualize the predictions on the image
         v = Visualizer(im[:, :, ::-1], MetadataCatalog.get(cfg.DATASETS.TRAIN[0]), scale=1.2)
         out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
         overlayed_image = out.get_image()[:, :, ::-1]
 
-        # Convert image to bytes
-        _, temp_file_path = tempfile.mkstemp(suffix='.jpg')
-        cv2.imwrite(temp_file_path, overlayed_image)
+        # Convert image to base64 string
+        _, buffer = cv2.imencode('.jpg', overlayed_image)
+        base64_image = base64.b64encode(buffer).decode('utf-8')
 
-        # Send the temporary file
-        response = send_file(temp_file_path, mimetype='image/jpeg', as_attachment=True)
-
-        # Cleanup: Delete the temporary file after sending
-        os.remove(temp_file_path)
+        # Construct and send JSON response
+        return jsonify({'image': base64_image, 'predictions': predictions})
 
         return response
 if __name__ == '__main__':
