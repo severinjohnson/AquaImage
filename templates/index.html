@@ -68,7 +68,8 @@
         border-radius: 15px; /* Rounded corners */
         padding: 15px; /* Padding inside the container */
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow for depth */
-        margin-left: 20px; /* Optional: adds spacing between the image and predictions container */
+        margin-left: 20px;/* Optional: adds spacing between the image and predictions container */
+        display: none;
         }
         #backButton {
             background-color: #505050;
@@ -79,8 +80,8 @@
             font-weight: bold;
             transition: background-color 0.3s, color 0.3s;
             margin: 5px;
-            display: none; /* Initially hidden */
             margin-top: 20px;
+            display: none;
         }
         #backButton:hover, #backButton:active {
             background-color: black;
@@ -138,27 +139,33 @@
         })
         .then(response => response.json())
         .then(data => {
-            // Handle the base64 image
-            var imgSrc = 'data:image/jpeg;base64,' + data.image;
-            var img = new Image();
-            img.src = imgSrc;
-            imageContainer.innerHTML = ''; // Clear previous image
-            imageContainer.appendChild(img);
+        // Handle the base64 image
+        var imgSrc = 'data:image/jpeg;base64,' + data.image;
+        var img = new Image();
+        img.src = imgSrc;
+        imageContainer.innerHTML = ''; // Clear previous image
+        imageContainer.appendChild(img);
 
-            // Handle predictions
-            var predictionsList = document.createElement('ul');
-            data.predictions.forEach(function(prediction) {
-                var listItem = document.createElement('li');
-                listItem.textContent = prediction;
-                predictionsList.appendChild(listItem);
-            });
-            predictionsContainer.innerHTML = ''; // Clear previous predictions
-            predictionsContainer.appendChild(predictionsList);
+        // Clear previous predictions and create title
+        predictionsContainer.innerHTML = '';
+        var title = document.createElement('h3');
+        title.textContent = 'Image Tags';
+        predictionsContainer.appendChild(title); // Append title first
 
-            // Show the result container and hide the drop container
-            resultContainer.style.display = 'flex';
-            dropContainer.style.display = 'none';
-            backButton.style.display = 'block';
+        // Create and append predictions list
+        var predictionsList = document.createElement('ul');
+        data.predictions.forEach(function(prediction) {
+            var listItem = document.createElement('li');
+            listItem.textContent = prediction;
+            predictionsList.appendChild(listItem);
+        });
+        predictionsContainer.appendChild(predictionsList); // Append list after title
+
+        // Show the result container and hide the drop container
+        resultContainer.style.display = 'flex';
+        predictionsContainer.style.display = 'block'; // Show predictions container
+        dropContainer.style.display = 'none';
+        backButton.style.display = 'block';
         })
         .catch(error => {
             console.error('Error:', error);

@@ -8,9 +8,7 @@ import cv2
 import numpy as np
 import base64
 from flask import jsonify
-import tempfile  # Import for handling temporary files
-import os
-from io import BytesIO
+
 
 app = Flask(__name__)
 
